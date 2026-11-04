@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'none'; object-src 'none'; base-uri 'none'">
+  <meta name="theme-color" content="#faf3e4">
+  <meta name="description" content="Your daily morningmixer challenge: tilt to pour, swirl, and match the target colour. A motion-only phone game.">
+  <meta name="application-name" content="morningmixer">
+  <meta name="application-version" content="1.6.0-test.6">
+  <title>morningmixer · Motion testing build</title>
+  <link rel="stylesheet" href="src/styles/base.css">
+  <link rel="stylesheet" href="src/styles/chibi.css">
+  <link rel="stylesheet" href="src/styles/layout.css">
+</head>
+<body>
+  <div class="play-viewport">
+    <header><a class="brand" href="#home" aria-label="morningmixer home">☀ morningmixer<small>BREAKFAST CLUB · TEST BUILD</small></a><button id="soundToggle" class="quiet" aria-pressed="true">Sound on</button></header>
+    <nav class="recipe-nav" aria-label="Choose your breakfast">
+      <a href="#coffee" data-order="coffee"><span aria-hidden="true">☕</span> Coffee</a>
+      <a href="#eggs" data-order="eggs"><span aria-hidden="true">🥚</span> Eggs</a>
+    </nav>
+    <main id="app"></main>
+  </div>
+  <noscript>This motion game needs JavaScript enabled.</noscript>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

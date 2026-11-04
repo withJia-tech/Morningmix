@@ -1,0 +1,16 @@
+/* Warm tabletop art, a glossy chibi barista, and bounded feedback animations. */
+.mascot-hero{height:250px;border-radius:30px;background:radial-gradient(ellipse at 50% 75%,#fff0b7 0%,#d9f2de 48%,#c3e9dc 100%);overflow:hidden;margin:16px 0 18px;box-shadow:inset 0 0 0 3px #fff8,0 6px 0 #a3d1bd}
+.welcome-mascot{height:100%;width:100%;object-fit:contain;filter:drop-shadow(0 8px 8px #405a3b22);animation:mascot-arrive .65s cubic-bezier(.18,.8,.3,1.2)}
+@keyframes mascot-arrive{0%{transform:translateY(24px) scale(.9)}65%{transform:translateY(-4px) scale(1.03)}100%{transform:translateY(0) scale(1)}}
+.game-board{position:relative;width:100%;overflow:hidden;border-radius:22px;background:#d8a56f url('../../assets/breakfast-anime.png') center/cover;box-shadow:inset 0 0 0 2px #ffffff88,0 6px 0 #d6c4a5}
+.game-board canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.order-ticket{position:absolute;top:12px;left:12px;z-index:2;background:#fffbeb;width:89px;padding:10px 7px;text-align:center;box-shadow:0 3px 8px #532e1533;border-radius:3px 3px 9px 9px}
+.order-ticket>span{font-size:9px;font-weight:900;letter-spacing:1px}.order-ticket small{font-size:9px}
+.target-swatch{width:45px;height:45px;border-radius:50%;margin:5px auto;border:4px solid white;box-shadow:0 1px 3px #0002}
+.board-amount{position:absolute;bottom:13px;left:50%;transform:translateX(-50%);background:#fff9e8ed;padding:5px 12px;border-radius:30px;font-size:11px;font-weight:800;white-space:nowrap}
+.ingredient{position:absolute;right:10%;top:13%;width:40px;height:78px;border-radius:8px 8px 12px 12px;background:linear-gradient(90deg,#43230f,#88532a,#20170f);border:2px solid #613d25;transform-origin:50% 75%;transform:rotate(18deg);box-shadow:3px 4px 5px #0002;display:flex;align-items:center;justify-content:center}
+.ingredient.coffee{background:linear-gradient(90deg,#c8deeb,#f5faf9 40%,#d4e4e7);border-color:#74979b}
+.ingredient-cap{position:absolute;top:-6px;left:6px;right:6px;height:12px;background:#47766c;border-radius:3px}
+.ingredient span{font-size:9px;font-weight:900;letter-spacing:1px;background:#fff6df;padding:4px}
+
+.scene-notice{position:absolute;bottom:46px;left:10px;right:10px;text-align:center;font-size:10px;color:#573723;background:#fff8dfdf;border-radius:8px;pointer-events:none}.scene-notice:empty{display:none}
