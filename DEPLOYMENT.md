@@ -113,3 +113,7 @@ User-requested change: a different milk sound for big-volume pours. Same GitHub 
 | Automated | `npm run check` (42 JS files) and `npm test` 67/67 passed locally and in CI; headless smoke at 320/390/1280 px shows no page errors |
 | Not verified | How the new sound feels on a phone speaker; real-phone motion, 3D rendering |
 | Production approval | Not requested / not promoted |
+
+## History squash — 4 November 2026
+
+At the owner's request, all earlier commits were replaced by one commit, `d78cac687ce2a0da86ef0f391a6da5dbf4608c95`, to remove personal account identifiers from the public history. Runtime files are byte-identical to test.6 (runtime SHA-256 `506ce2b098c5…`). Commit hashes in the records above (`2a81ad3…`, `b6f107b…`) no longer exist in this repository. Redeployed to GitHub Pages from `d78cac6`: Actions run 41780096581, success.
