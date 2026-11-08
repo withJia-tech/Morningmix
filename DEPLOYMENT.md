@@ -117,3 +117,15 @@ User-requested change: a different milk sound for big-volume pours. Same GitHub 
 ## History squash — 4 November 2026
 
 At the owner's request, all earlier commits were replaced by one commit, `d78cac687ce2a0da86ef0f391a6da5dbf4608c95`, to remove personal account identifiers from the public history. Runtime files are byte-identical to test.6 (runtime SHA-256 `506ce2b098c5…`). Commit hashes in the records above (`2a81ad3…`, `b6f107b…`) no longer exist in this repository. Redeployed to GitHub Pages from `d78cac6`: Actions run 41780096581, success.
+
+## test.8 yolk swirl — 8 November 2026 (GitHub Pages)
+
+| Field | Evidence |
+| --- | --- |
+| Preview URL | https://withjia-tech.github.io/Morningmix/ (diagnostics: add `?diagnostics=1`) |
+| Commit | `3ac4eb4374d1c9c3f86b4cb4facba4cd3b60eccc` (test.7 diagnostics + yolk swirl candidate, merged on `motion-engineering`, fast-forwarded to `main`) |
+| Workflow run / deployment | Actions run 42467611671 (success); GitHub deployment 7634101288 |
+| Runtime build | `morningmixer-1.6.0-test.8+95b8dd5ea5f0` (runtime SHA-256 `95b8dd5ea5f03ceebed2270f19dfdd7b29919c7cc63ff9dfe33f75216f0e6ff1`) |
+| Automated | check passed (49 JS files); 82 tests: 81 pass, 0 fail, 1 TODO, locally and in CI |
+| Not verified | Real-phone yolk swirl and motion; coffee/milk swirl visuals unchanged and still open |
+| Production approval | Not requested / not promoted |
