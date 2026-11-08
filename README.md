@@ -24,6 +24,13 @@ Every push to `main` runs check, test and build in GitHub Actions, then deploys 
 
 Motion code can only **propose** a pour. `gameEngine.js` is the only code that changes the amount, attempts or score. Views and sound only read what the engine publishes.
 
+![morningmixer code map: phone tilt flows through sensorSource, calibration, motionFilter and tiltPour into intentBus; gameEngine, the only writer of game state, validates and commits, then publishes snapshots to the UI and accepted pours with flow to sound; pure domain rules feed the engine, tiltPour and UI colours](docs/code-map.svg)
+
+Teal marks the engine, the only writer of game state. Amber marks pour strength (flow), which picks the milk sound. Dashed lines are shared rules and guards.
+
+<details>
+<summary>Same flow as a text diagram</summary>
+
 ```mermaid
 flowchart LR
   subgraph Proposes
@@ -43,6 +50,8 @@ flowchart LR
   A --> A2[big milk pour: milkPour.js]
   A --> A3[gentle milk: hiss + blip]
 ```
+
+</details>
 
 `src/motion/motionSession.js` wires the motion stages together (it used to live inside `src/main.js`), so the app and the replay tests run the same code. `src/main.js` only connects the session to the page and decides nothing about quantities. See `ARCHITECTURE.md` for the validation rules, failure states and lifecycle.
 
@@ -92,7 +101,8 @@ src/
 assets/                     Artwork, chibi barista, vendored Three.js (MIT)
 scripts/                    check.js, serve.js (dev only), build.js
 tests/                      node:test suites per layer, pipeline seams, motion replay harness
-docs/                       motion-mapping.md, ui-style-guide.md, release-checklist.md
+docs/                       code-map.svg, engineering-notes.md, motion-mapping.md, ui-style-guide.md,
+                            release-checklist.md, yolk-swirl-note.md
 ```
 
 ### Boundaries `npm run check` enforces
