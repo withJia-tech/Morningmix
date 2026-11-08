@@ -124,3 +124,17 @@ Two more tests check that the diagnostics are a read-only copy and that the pane
 - *Near-upright tilt (open TODO test).* The pipeline uses the browser's Euler `beta`/`gamma`. With the phone near upright, a 1° twist reads as a roll of more than 50°, so a forward big pour stops as `reposition` at about 89–90°. Reproduce with `node --test tests/motionReplay.test.js` (reported as TODO). The fix needs a gravity-vector mapping, which changes motion behaviour, so it is not part of this change.
 - *No-sensor browsers.* Desktop Chromium sends one trusted `deviceorientation` event with null values when no sensor exists. The app reports that as `invalid_readings` ("The sensor sent invalid readings") rather than `unsupported`. Seen through the diagnostics panel; the behaviour is unchanged from before test.7.
 - The replay drives `beta`/`gamma` values, not hardware. Real-phone acceptance is still required.
+
+## test.8 yolk swirl integration — 8 November 2026
+
+The yolk-swirl candidate (built from test.5) was merged onto test.7. The test.6 big milk pour sound, the test.7 diagnostics (`?diagnostics=1`) and the personal-data cleanup are kept. The candidate's own `?motionDebug=1` panel and replay fixture were not merged, at the owner's choice. Its fifth swirl test was ported to the shared replay harness, so it now runs the app's real motion-session wiring.
+
+- **Automated:** `npm run check` passes (49 JS files). `npm test` runs 82 tests: 81 pass, 0 fail, 1 TODO (the near-upright limitation from test.7).
+- **Mutation check:** three injected swirl regressions were all caught. They were reversing the wrist un-mixing the yolks, stale controls still blending, and the pipeline losing roll speed.
+- **Browser (headless Chromium, 390 px, simulated sensor; the 3D scene rendered):**
+  - Eggs starts with two intact yolks; forward tilt added 3 drops with the yolks intact.
+  - Wrist roll near the grip dissolved the yolks and added no soy and used no try.
+  - Coffee and back kept both the cup and the blend.
+  - Serving a miss used one try and returned intact yolks in an empty bowl. No page errors.
+- **User-reported iPhone result, carried from the candidate's notes** (exact tested URL, build and iOS version unconfirmed): permission, calibration and the neutral stop worked, and the overlay did not obscure gameplay. Swirl was not visible in the yolk or milk animation. This build addresses the yolks; the coffee/milk swirl visuals are unchanged and remain open.
+- **Not verified:** real-phone swirl feel and timing (about 2 s at maximum swirl is an initial tuning choice), and GPU rendering on a real device.

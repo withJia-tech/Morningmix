@@ -1,6 +1,6 @@
 {
   "name": "morningmixer",
-  "version": "1.6.0-test.7",
+  "version": "1.6.0-test.8",
   "private": true,
   "type": "module",
   "description": "Motion-only modular testing build; ephemeral sessions",

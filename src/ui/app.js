@@ -4,8 +4,11 @@ import { renderHud } from './hud.js';
 import { renderMotionStatus } from './motionStatus.js';
 export function createApp(root, commands) {
   let shown = null, scene = null;
+  // Decorative progress belongs to the current bowl; navigation must not unmix it.
+  const mixingByRound=new Map();
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   function build(state) {
+    if(scene)mixingByRound.set(shown,scene.mixingProgress());
     scene?.dispose(); scene = null;
     if (state.view === 'home') {
       root.innerHTML = `<section class="welcome"><span class="eyebrow">A LITTLE MORNING CHALLENGE</span><h1>Find your<br>perfect blend.</h1><p>Coffee or eggs? Both are ready every day.<br>Tilt to pour. Move side to side to swirl.</p><div class="order-choices"><a class="order-choice" href="#coffee" data-order="coffee"><span class="choice-icon" aria-hidden="true">☕</span><strong>Coffee →</strong><small>Pour milk. Find your blend.</small></a><a class="order-choice" href="#eggs" data-order="eggs"><span class="choice-icon" aria-hidden="true">🥚</span><strong>Eggs →</strong><small>Add soy. Match the yolks.</small></a></div><small class="switch-note">Switch any time. Your mixes and tries stay until reload.</small><div class="mascot-hero"><img class="welcome-mascot" src="assets/barista-chibi.png" alt="A cheerful chibi barista holding a coffee cup"></div><small>Phone motion required · 5 tries per order · No login</small><p class="session-note">Testing build. Session history clears on reload.</p><details><summary>This session’s results</summary><ul id="sessionHistory"></ul></details></section>`;
@@ -22,11 +25,13 @@ export function createApp(root, commands) {
     root.querySelector('#motionButton').onclick = commands.motion;
     root.querySelector('#serve').onclick = commands.submit;
     scene = new BreakfastScene(root.querySelector('#scene'),mode,state.round.amount,reduced(),commands.graphicsInterrupted);
+    scene.restoreMixing(mixingByRound.get(state.round.id)??0);
   }
   return Object.freeze({ render(state,event) {
     const key = state.view === 'home' ? 'home' : state.round.id;
-    if (shown !== key) { shown = key; build(state); root.scrollTop = 0; }
+    if (shown !== key) { build(state); shown = key; root.scrollTop = 0; }
     if (state.view === 'home') return;
+    if(event.type==='SERVED'&&!state.round.finished){mixingByRound.delete(state.round.id);scene.restoreMixing(0);}
     scene.setControl(state.control);
     scene.set(state.round.amount,event.type === 'POUR_ACCEPTED');
     if (event.type !== 'CONTROL') { renderHud(root,state); renderMotionStatus(root,state); }

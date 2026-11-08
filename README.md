@@ -1,6 +1,6 @@
 # morningmixer
 
-**1.6.0-test.7 — modular, motion-only testing build.**
+**1.6.0-test.8 — modular, motion-only testing build.**
 Preview: https://withjia-tech.github.io/Morningmix/
 
 Pick coffee or eggs, calibrate a comfortable phone grip, tilt to pour, move side to side to swirl, and serve when the colour matches. Return to your grip to stop pouring. Motion is the only way to add ingredient: there is no direct-add button and no keyboard pour. History lives in memory and clears on reload; switching recipes keeps each cup.
@@ -78,6 +78,7 @@ src/
     baristaModels.js        Original 3D meshes built in code
     liquid.js               Bounded 2D dye swirl texture (visual only)
     diagnosticsPanel.js     Development-only motion panel (?diagnostics=1), read-only
+    yolkSwirl.js            Eggs: wrist roll blends the yolks (visual only, never un-mixes)
   audio/
     sound.js                Web Audio: chiptune, pour, serve sounds; mute and background stop
     gurgle.js               Synthesised soy-drop bubbles

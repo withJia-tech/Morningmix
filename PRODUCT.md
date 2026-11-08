@@ -67,3 +67,9 @@ Soy additions trigger a locally synthesised gurgle. An original, quiet chiptune 
 The user confirmed the egg experience works but could not find coffee. Both recipes are now available every day. Permanent Coffee / Eggs links stay visible above the scrolling game area, with a highlighted current page. The home screen offers two named cards before the mascot. The logo and Menu return home without reloading. Direct links and browser Back/Forward use the same navigation path.
 
 Navigation stops motion immediately; selecting another recipe never pours or consumes an attempt. Each order has five tries, with mixture/progress retained separately in memory for the current launch. Returning to a completed order shows its result. Reload intentionally starts a fresh testing session, as before.
+
+## Yolk mixing candidate — 8 November 2026
+
+Wrist roll blends the two yolks irreversibly as a presentation effect. Either rotation direction accumulates mixing; reversing direction cannot restore intact yolks. Forward/back tilt alone adds soy and retains the yolks. Screen orientation changes still pause. This uses the existing relative-roll-speed signal, not compass yaw or an acceleration-based circular gesture classifier.
+
+The yolks orbit, shrink and fade into the existing scored mixture colour; reduced-motion mode fades without orbital movement. About two seconds at maximum accepted swirl completes blending; weaker motion takes longer. This is a visual tuning choice, not a change to motion or scoring thresholds. Visual blend progress survives menu/recipe navigation within the launch; a scored miss starts a fresh bowl. Reload resets session state.

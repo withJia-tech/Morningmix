@@ -1,3 +1,4 @@
+import { YolkSwirl, yolkPose } from './yolkSwirl.js';
 import * as T from '../../assets/vendor/three/three.module.min.js';
 import { mix } from '../domain/mixture.js';
 import { recipes } from '../domain/recipes.js';
@@ -9,7 +10,7 @@ import { createCup,createMilkJug,createEggBowl,createSoyBottle,createShadow,disp
 export class BreakfastScene {
   constructor(canvas,mode,amount,reduced=false,onInterrupt=()=>{}) {
     this.canvas=canvas;this.mode=mode;this.amount=amount;this.reduced=reduced;
-    this.control={};this.frame=null;this.lastDraw=0;this.activityUntil=0;this.disposed=false;
+    this.swirl=new YolkSwirl();this.control={};this.frame=null;this.lastDraw=0;this.activityUntil=0;this.disposed=false;
     this.from=this.to=mix(mode,amount);this.changedAt=0;this.field=new LiquidField(96);
     this.notice=canvas.parentElement.querySelector('.scene-notice');
     try {this.renderer=new T.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'low-power'});}
@@ -43,7 +44,7 @@ export class BreakfastScene {
     this.surface.rotation.x=-Math.PI/2;this.surface.position.y=vessel.surfaceY;this.cup.add(this.surface);
     this.yolks=[];
     if(mode==='eggs')for(const x of [-.43,.43]){
-      const yolk=new T.Mesh(new T.SphereGeometry(.40,32,20),new T.MeshPhongMaterial({color:0xf7bd3d,shininess:100}));
+      const yolk=new T.Mesh(new T.SphereGeometry(.40,32,20),new T.MeshPhongMaterial({color:0xf7bd3d,shininess:100,transparent:true}));
       yolk.scale.set(1,.24,1);yolk.position.set(x,vessel.surfaceY+.01,x*.23);this.cup.add(yolk);this.yolks.push(yolk);
     }
     this.stream=new T.Mesh(new T.CylinderGeometry(1,1,1,12),new T.MeshPhongMaterial({color:mode==='coffee'?0xfff6dc:0x49220e,shininess:100}));
@@ -60,6 +61,8 @@ export class BreakfastScene {
     document.addEventListener('visibilitychange',this.onVisibility);
     this.observer=new ResizeObserver(()=>this.request());this.observer.observe(canvas);this.request();
   }
+  mixingProgress(){return this.fallback?this.fallback.mixingProgress():this.swirl.progress;}
+  restoreMixing(progress){if(this.fallback){this.fallback.restoreMixing(progress);return;}this.swirl=new YolkSwirl(progress);this.request();}
   request(){if(!this.disposed&&!this.lost&&document.visibilityState==='visible'&&this.frame===null)this.frame=requestAnimationFrame(t=>{this.frame=null;this.draw(t);});}
   setControl(data){if(this.fallback){this.fallback.setControl(data);const pitch=this.reduced?0:data?.pitch||0,roll=this.reduced?0:data?.roll||0;this.fallbackVessel.style.transform=`translate(${roll*.25}px,0) rotate(${18+pitch*.65+roll*.2}deg)`;return;}this.control=data||{};this.request();}
   set(amount,animate=false){
@@ -88,10 +91,17 @@ export class BreakfastScene {
     this.pitcher.rotation.x=this.reduced?0:roll*.004;
     this.pitcher.position.x=1.29+(this.reduced?0:Math.max(-.15,Math.min(.15,roll*.006)));
     const base=this.current(now);
+    const mixing=this.swirl.step(this.mode==='eggs'?this.control:null,now,dt);
     if(!this.reduced)this.field.step(dt,drive+(flow>0?2:0));
     this.field.paint(this.pixels.data,base,recipes[this.mode].add);
     this.textureContext.putImageData(this.pixels,0,0);this.liquidTexture.needsUpdate=true;
-    for(const yolk of this.yolks)yolk.material.color.setRGB(base[0]/255,base[1]/255,base[2]/255,T.SRGBColorSpace);
+    for(const [i,yolk] of this.yolks.entries()){
+      const pose=yolkPose(i,mixing.progress,mixing.phase,this.reduced);
+      yolk.position.set(pose.x,this.surfaceY+.01,pose.z);
+      yolk.scale.set(pose.scale,.24*pose.scale,pose.scale);
+      yolk.material.opacity=pose.opacity;yolk.visible=pose.visible;
+      yolk.material.color.setRGB(base[0]/255,base[1]/255,base[2]/255,T.SRGBColorSpace);
+    }
     this.stream.visible=flow>0;
     if(flow>0){
       const start=this.spout.getWorldPosition(new T.Vector3()),end=new T.Vector3(-.33,this.surfaceY+.01,.22),delta=end.clone().sub(start);

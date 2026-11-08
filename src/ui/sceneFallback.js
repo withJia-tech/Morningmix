@@ -1,3 +1,4 @@
+import { YolkSwirl, yolkPose } from './yolkSwirl.js';
 import { mix } from '../domain/mixture.js';
 import { recipes } from '../domain/recipes.js';
 import { LiquidField } from './liquid.js';
@@ -6,11 +7,13 @@ export class BreakfastScene {
   constructor(canvas,mode,amount,reduced=false) {
     this.canvas=canvas;this.mode=mode;this.amount=amount;this.reduced=reduced;
     this.from=this.to=mix(mode,amount);this.changedAt=0;this.pourUntil=0;this.activityUntil=0;
-    this.frame=null;this.disposed=false;this.lastDraw=0;this.control={};
+    this.swirl=new YolkSwirl();this.frame=null;this.disposed=false;this.lastDraw=0;this.control={};
     this.field=new LiquidField(96);this.texture=document.createElement('canvas');this.texture.width=this.texture.height=96;
     this.textureContext=this.texture.getContext('2d');this.pixels=this.textureContext.createImageData(96,96);
     this.observer=new ResizeObserver(()=>this.request());this.observer.observe(canvas);this.request();
   }
+  mixingProgress(){return this.swirl.progress;}
+  restoreMixing(progress){this.swirl=new YolkSwirl(progress);this.request();}
   request() {if(!this.disposed&&this.frame===null)this.frame=requestAnimationFrame(t=>{this.frame=null;this.draw(t);});}
   setControl(data) {
     this.control=data||{};
@@ -63,12 +66,16 @@ export class BreakfastScene {
       this.field.paint(this.pixels.data,base,recipes[this.mode].add);this.textureContext.putImageData(this.pixels,0,0);
       ctx.imageSmoothingEnabled=true;ctx.drawImage(this.texture,x-r,y-r,r*2,r*2);
     }
+    const mixing=this.swirl.step(this.mode==='eggs'?this.control:null,now,dt);
     if(this.mode==='eggs'){
-      for(const sign of [-1,1]){
-        const xx=x+sign*r*.40,yy=y+sign*r*.08;
+      for(const i of [0,1]){
+        const pose=yolkPose(i,mixing.progress,mixing.phase,this.reduced);
+        if(!pose.visible)continue;
+        const xx=x+pose.x*r,yy=y+pose.z*r;
+        ctx.save();ctx.globalAlpha=pose.opacity;
         const yolk=ctx.createRadialGradient(xx-r*.13,yy-r*.16,2,xx,yy,r*.43);
         yolk.addColorStop(0,'#fff7b548');yolk.addColorStop(.45,'#ffffd006');yolk.addColorStop(1,'#713d1335');circle(xx,yy,r*.42,yolk);
-        ctx.save();ctx.filter='blur(1.5px)';ctx.beginPath();ctx.ellipse(xx-r*.11,yy-r*.20,r*.12,r*.045,-.5,0,Math.PI*2);ctx.fillStyle='#fffce6a0';ctx.fill();ctx.restore();
+        ctx.save();ctx.filter='blur(1.5px)';ctx.beginPath();ctx.ellipse(xx-r*.11,yy-r*.20,r*.12,r*.045,-.5,0,Math.PI*2);ctx.fillStyle='#fffce6a0';ctx.fill();ctx.restore();ctx.restore();
       }
     }else{
       const crema=ctx.createRadialGradient(x,y,r*.76,x,y,r);
