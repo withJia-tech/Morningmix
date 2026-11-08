@@ -138,6 +138,7 @@ Automated checks and tests are synthetic: they prove logic, not hardware. Browse
 - `TESTING.md`: evidence standards and the real-phone walkthrough.
 - `MEMORY.md`: decisions, regressions and open questions.
 - `REFERENCES.md`: source provenance and platform documentation.
+- `docs/engineering-notes.md`: motion engineering notes (diagnostics, replay, yolk swirl), with findings and lessons.
 - `docs/motion-mapping.md`: exact thresholds and intent semantics.
 - `docs/ui-style-guide.md`: visual rules and asset provenance.
 
