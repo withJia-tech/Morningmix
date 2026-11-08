@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="640" viewBox="0 0 1000 640" role="img" aria-label="morningmixer tilt-to-pour data flow. Phone tilt passes through sensorSource, calibration, motionFilter and tiltPour, which proposes a POUR intent through intentBus. gameEngine is the only writer: it validates each intent and commits amount, attempts and score, then publishes a snapshot to the UI and an accepted-pour event with flow to sound. Pure domain rules feed the engine, tiltPour and the UI colours. Platform guards and the player's taps start and stop motion; Serve goes to the engine.">
+        <style>
+.zone{font:700 12px system-ui,-apple-system,'Segoe UI',sans-serif;letter-spacing:.1em;text-transform:uppercase;fill:#4b443c}
+.zone.engine{fill:#005f6b}
+.boundary{stroke:#cdc5b9;stroke-width:1.5;stroke-dasharray:2 6;stroke-linecap:round}
+.box{fill:#fff;stroke:#16130f;stroke-width:1.5}.box.platform{stroke-dasharray:6 4}
+.box.engine{fill:#e8f3f4;stroke:#005f6b;stroke-width:3}.box.domain{fill:#f5f2ed}
+.t{font:700 13px system-ui,-apple-system,'Segoe UI',sans-serif;fill:#16130f}
+.f{font:600 13px ui-monospace,'SF Mono',Menlo,Consolas,monospace;fill:#16130f}.f.engine{fill:#005f6b;font-size:14px}
+.s{font:11.5px system-ui,-apple-system,'Segoe UI',sans-serif;fill:#4b443c}.s.ink{fill:#16130f}.s.new,.f.new{fill:#9e4600}.s.b{font-weight:700;fill:#16130f}
+.s.new.b{fill:#9e4600}
+.div{stroke:#005f6b;stroke-width:1;opacity:.45}
+.edge{fill:none;stroke:#16130f;stroke-width:1.6}.edge.dash{stroke-dasharray:6 5}
+.lbl{font:11.5px system-ui,-apple-system,'Segoe UI',sans-serif;fill:#16130f;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
+.lbl.m{font:11px ui-monospace,Menlo,Consolas,monospace}.lbl.new{fill:#9e4600;font-weight:700}
+.ah{fill:#16130f}
+</style>
+<rect x="0" y="0" width="1000" height="640" fill="#ffffff"/>
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+          </marker>
+        </defs>
+
+        <!-- Zones -->
+        <text class="zone" x="20" y="26">Proposes · motionSession.js + your taps</text>
+        <text class="zone engine" x="610" y="26" text-anchor="middle">Decides</text>
+        <text class="zone" x="880" y="26" text-anchor="middle">Shows and plays</text>
+        <line class="boundary" x1="480" y1="40" x2="480" y2="530"/>
+        <line class="boundary" x1="750" y1="40" x2="750" y2="530"/>
+
+        <!-- Motion pipeline, column 1 -->
+        <rect class="box" x="20" y="50" width="200" height="58" rx="4"/>
+        <text class="t" x="120" y="74" text-anchor="middle">Phone tilt</text>
+        <text class="s" x="120" y="93" text-anchor="middle">deviceorientation event</text>
+
+        <rect class="box" x="20" y="140" width="200" height="58" rx="4"/>
+        <text class="f" x="120" y="164" text-anchor="middle">sensorSource.js</text>
+        <text class="s" x="120" y="183" text-anchor="middle">permission · stale-stream stop</text>
+
+        <rect class="box" x="20" y="230" width="200" height="58" rx="4"/>
+        <text class="f" x="120" y="254" text-anchor="middle">calibration.js</text>
+        <text class="s" x="120" y="273" text-anchor="middle">records your neutral grip</text>
+
+        <rect class="box" x="20" y="320" width="200" height="58" rx="4"/>
+        <text class="f" x="120" y="344" text-anchor="middle">motionFilter.js</text>
+        <text class="s" x="120" y="363" text-anchor="middle">smoothing · stop near neutral</text>
+
+        <rect class="box" x="20" y="410" width="200" height="64" rx="4"/>
+        <text class="f" x="120" y="434" text-anchor="middle">tiltPour.js</text>
+        <text class="s" x="120" y="453" text-anchor="middle">flow → 5 ml / 1-drop portions</text>
+
+        <line class="edge" x1="120" y1="108" x2="120" y2="138" marker-end="url(#ah)"/>
+        <text class="lbl" x="130" y="128">pitch · roll</text>
+        <line class="edge" x1="120" y1="198" x2="120" y2="228" marker-end="url(#ah)"/>
+        <text class="lbl" x="130" y="218">fresh readings</text>
+        <line class="edge" x1="120" y1="288" x2="120" y2="318" marker-end="url(#ah)"/>
+        <text class="lbl" x="130" y="308">angle vs. grip</text>
+        <line class="edge" x1="120" y1="378" x2="120" y2="408" marker-end="url(#ah)"/>
+        <text class="lbl" x="130" y="398">smoothed tilt</text>
+
+        <!-- Column 2: taps, platform, bus -->
+        <rect class="box" x="290" y="140" width="160" height="58" rx="4"/>
+        <text class="t" x="370" y="164" text-anchor="middle">Your taps</text>
+        <text class="s" x="370" y="183" text-anchor="middle">Enable motion · Serve</text>
+
+        <rect class="box platform" x="290" y="230" width="160" height="58" rx="4"/>
+        <text class="f" x="370" y="254" text-anchor="middle">platform/</text>
+        <text class="s" x="370" y="273" text-anchor="middle">page hidden · screen rotated</text>
+
+        <rect class="box" x="290" y="410" width="160" height="64" rx="4"/>
+        <text class="f" x="370" y="434" text-anchor="middle">intentBus.js</text>
+        <text class="s" x="370" y="453" text-anchor="middle">frozen copy · one executor</text>
+
+        <line class="edge" x1="290" y1="169" x2="223" y2="169" marker-end="url(#ah)"/>
+        <text class="lbl m" x="256" y="161" text-anchor="middle">start()</text>
+        <path class="edge dash" d="M290,259 L223,190" marker-end="url(#ah)"/>
+        <text class="lbl m" x="262" y="242" text-anchor="middle">stop()</text>
+
+        <line class="edge" x1="220" y1="442" x2="287" y2="442" marker-end="url(#ah)"/>
+        <text class="lbl" x="254" y="434" text-anchor="middle">POUR</text>
+        <line class="edge" x1="450" y1="442" x2="507" y2="442" marker-end="url(#ah)"/>
+        <text class="lbl" x="480" y="434" text-anchor="middle">publish</text>
+
+        <path class="edge" d="M450,160 H610 V227" marker-end="url(#ah)"/>
+        <text class="lbl" x="540" y="152" text-anchor="middle">Serve → submit()</text>
+
+        <!-- Engine -->
+        <rect class="box engine" x="510" y="230" width="200" height="244" rx="5"/>
+        <text class="f engine" x="526" y="256">gameEngine.js</text>
+        <text class="s" x="526" y="275">the only writer of game state</text>
+        <line class="div" x1="526" y1="289" x2="694" y2="289"/>
+        <text class="s b" x="526" y="308">Checks every intent</text>
+        <text class="s ink" x="526" y="326">epoch · seq · age ≤ 250 ms</text>
+        <text class="s ink" x="526" y="343">flow matches live tilt</text>
+        <text class="s ink" x="526" y="360">at most 2 portions / second</text>
+        <line class="div" x1="526" y1="376" x2="694" y2="376"/>
+        <text class="s b" x="526" y="395">Commits</text>
+        <text class="s ink" x="526" y="413">amount · attempts · score</text>
+        <text class="s ink" x="526" y="430">then emits snapshot + event</text>
+        <text class="s" x="526" y="458">game/</text>
+
+        <!-- Outputs -->
+        <rect class="box" x="790" y="230" width="180" height="96" rx="4"/>
+        <text class="f" x="806" y="254">ui/</text>
+        <text class="s ink" x="806" y="274">app · hud · motionStatus</text>
+        <text class="s ink" x="806" y="292">scene · liquid · yolkSwirl</text>
+        <text class="s" x="806" y="312">diagnosticsPanel (read-only)</text>
+
+        <rect class="box" x="790" y="346" width="180" height="128" rx="4"/>
+        <text class="f" x="806" y="370">audio/sound.js</text>
+        <text class="s ink" x="806" y="392">soy → gurgle.js</text>
+        <text class="s ink" x="806" y="411">gentle milk → hiss + blip</text>
+        <text class="s new b" x="806" y="432">big milk → milkPour.js</text>
+        <text class="s new" x="806" y="451">flow ≥ 0.6 (≈ 31° past grip)</text>
+
+        <line class="edge" x1="710" y1="278" x2="787" y2="278" marker-end="url(#ah)"/>
+        <text class="lbl" x="750" y="270" text-anchor="middle">snapshot</text>
+        <line class="edge" x1="710" y1="412" x2="787" y2="412" marker-end="url(#ah)"/>
+        <text class="lbl" x="750" y="404" text-anchor="middle">accepted pour</text>
+        <text class="lbl new" x="750" y="430" text-anchor="middle">+ flow</text>
+
+        <!-- Domain -->
+        <rect class="box domain" x="430" y="556" width="360" height="64" rx="4"/>
+        <text class="f" x="610" y="580" text-anchor="middle">domain/ · pure rules, no browser APIs</text>
+        <text class="s" x="610" y="600" text-anchor="middle">recipes · mixture · round · scoring · motionRules</text>
+
+        <line class="edge" x1="610" y1="556" x2="610" y2="477" marker-end="url(#ah)"/>
+        <text class="lbl" x="620" y="520">rules</text>
+        <path class="edge dash" d="M430,598 H120 V477" marker-end="url(#ah)"/>
+        <text class="lbl" x="275" y="590" text-anchor="middle">shared thresholds (motionRules)</text>
+        <path class="edge dash" d="M790,598 H990 V300 H973" marker-end="url(#ah)"/>
+        <text class="lbl" x="890" y="590" text-anchor="middle">colours, recipe names</text>
+      </svg>
