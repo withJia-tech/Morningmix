@@ -1,60 +1,26 @@
 import { dayKey } from './domain/recipes.js';
 import { createGameEngine } from './game/gameEngine.js';
 import { createIntentBus } from './game/intentBus.js';
-import { SensorSource, browserSensorEnvironment } from './motion/sensorSource.js';
-import { Calibration } from './motion/calibration.js';
-import { MotionFilter } from './motion/motionFilter.js';
-import { TiltPour } from './motion/tiltPour.js';
-import { ACTIVE_STATES } from './motion/motionErrors.js';
+import { browserSensorEnvironment } from './motion/sensorSource.js';
+import { createMotionSession } from './motion/motionSession.js';
 import { observeVisibility } from './platform/visibility.js';
 import { createOrientationGuard } from './platform/orientationGuard.js';
 import { createApp } from './ui/app.js';
 import { GameAudio } from './audio/sound.js';
+import { diagnosticsRequested, createDiagnosticsPanel } from './ui/diagnosticsPanel.js';
 
 const now = () => performance.now();
 const engine = createGameEngine({now}), bus = createIntentBus(engine.accept);
-const calibration = new Calibration(), filter = new MotionFilter(), tilt = new TiltPour(), audio = new GameAudio();
-let token = null, startedAt = 0;
-const motionStatus = state => token === null ? {accepted:false} : bus.publish({type:'MOTION_STATUS',state,epoch:token,at:now(),source:'sensor'});
-const clearControls = () => { calibration.reset(); filter.reset(); tilt.reset(); };
-const guard = createOrientationGuard(reason => stop(reason));
-const source = new SensorSource(browserSensorEnvironment(), {
-  canRead: () => token === engine.snapshot().epoch && engine.snapshot().view === 'round' && !!engine.snapshot().round && !engine.snapshot().round.finished && document.visibilityState === 'visible' && guard.check(),
-  onState(state) {
-    if (ACTIVE_STATES.includes(state)) {
-      if (state === 'waiting') startedAt = now();
-      motionStatus(state);
-    }
-    else { guard.disarm(); clearControls(); motionStatus(state); token = null; }
-  },
-  onSample(sample) {
-    const result = calibration.sample(sample);
-    if (result.error) { stop(result.error); return; }
-    if (result.calibrating) {
-      if (now() - startedAt >= 15000) { stop('unstable'); return; }
-      motionStatus('calibrating'); return;
-    }
-    if (result.calibrated) { motionStatus('active'); return; }
-    const filtered = filter.sample(result.pitch,result.roll,result.at);
-    if (!filtered) { stop('invalid_readings'); return; }
-    for (const intent of tilt.sample(engine.snapshot().round.mode,filtered,token)) bus.publish(intent);
-  }
-});
-function stop(reason = 'paused') { guard.disarm(); source.stop(reason); }
-function enable() {
-  const state = engine.snapshot();
-  if (!state.round || state.round.finished || document.visibilityState !== 'visible') return;
-  if (ACTIVE_STATES.includes(state.motion)) { stop(); return; }
-  stop();
-  if (!guard.arm()) { engine.pause('portrait_required'); return; }
-  clearControls(); token = engine.beginMotion(); startedAt = now();
-  // Permission remains directly inside this button gesture. No awaited audio/setup work.
-  source.start(); audio.unlock();
-}
+const audio = new GameAudio();
+const guard = createOrientationGuard(reason => session.stop(reason));
+const session = createMotionSession({ engine, bus, env: browserSensorEnvironment(), guard,
+  isVisible: () => document.visibilityState === 'visible', now });
+const stop = reason => session.stop(reason);
 const app = createApp(document.querySelector('#app'), {
   home() { stop(); location.hash = 'home'; },
   graphicsInterrupted() { stop(); },
-  motion: enable,
+  // Keep both calls inside the tap: permission and audio unlock need the user gesture.
+  motion() { if (session.enable()) audio.unlock(); },
   submit() { stop(); engine.submit(); }
 });
 engine.subscribe((state,event) => {
@@ -67,7 +33,7 @@ engine.subscribe((state,event) => {
   if (event.type === 'POUR_ACCEPTED') audio.pour(state.round.mode,event.flow);
   if (event.type === 'SERVED') audio.finish(event.result.won);
 });
-observeVisibility(reason => { audio.setVisible(false); if (ACTIVE_STATES.includes(engine.snapshot().motion)) stop(reason); });
+observeVisibility(reason => { audio.setVisible(false); session.interrupt(reason); });
 document.addEventListener('visibilitychange', () => audio.setVisible(document.visibilityState === 'visible'));
 window.addEventListener('pageshow', () => audio.setVisible(document.visibilityState === 'visible'));
 const sound = document.querySelector('#soundToggle');
@@ -90,3 +56,10 @@ document.addEventListener('click', event => {
 });
 window.addEventListener('hashchange',openRoute);
 openRoute();
+
+// Development only: ?diagnostics=1 shows a read-only motion panel. Off in normal play.
+if (diagnosticsRequested(location.search)) {
+  const panel = createDiagnosticsPanel(document);
+  const frame = () => { panel.render(session.diagnostics()); requestAnimationFrame(frame); };
+  requestAnimationFrame(frame);
+}

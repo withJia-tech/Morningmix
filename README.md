@@ -1,6 +1,6 @@
 # morningmixer
 
-**1.6.0-test.6 — modular, motion-only testing build.**
+**1.6.0-test.7 — modular, motion-only testing build.**
 Preview: https://withjia-tech.github.io/Morningmix/
 
 Pick coffee or eggs, calibrate a comfortable phone grip, tilt to pour, move side to side to swirl, and serve when the colour matches. Return to your grip to stop pouring. Motion is the only way to add ingredient: there is no direct-add button and no keyboard pour. History lives in memory and clears on reload; switching recipes keeps each cup.
@@ -44,7 +44,7 @@ flowchart LR
   A --> A3[gentle milk: hiss + blip]
 ```
 
-`src/main.js` wires these pieces together and decides nothing about quantities. See `ARCHITECTURE.md` for the validation rules, failure states and lifecycle.
+`src/motion/motionSession.js` wires the motion stages together (it used to live inside `src/main.js`), so the app and the replay tests run the same code. `src/main.js` only connects the session to the page and decides nothing about quantities. See `ARCHITECTURE.md` for the validation rules, failure states and lifecycle.
 
 ## Codebase structure
 
@@ -68,6 +68,8 @@ src/
     motionFilter.js         Smoothing; immediate stop near neutral
     tiltPour.js             Turns flow into bounded POUR intents (pure)
     motionErrors.js         Named failure states and recovery copy
+    motionSession.js        Wires sensor → calibration → filter → tilt → bus; start/stop rules
+    diagnostics.js          Pure labels for the diagnostics panel (state, permission)
   ui/
     app.js                  Renders engine snapshots; sends user commands
     hud.js, motionStatus.js Tries, amount, motion status and recovery text
@@ -75,6 +77,7 @@ src/
     sceneFallback.js        2D renderer when WebGL is unavailable
     baristaModels.js        Original 3D meshes built in code
     liquid.js               Bounded 2D dye swirl texture (visual only)
+    diagnosticsPanel.js     Development-only motion panel (?diagnostics=1), read-only
   audio/
     sound.js                Web Audio: chiptune, pour, serve sounds; mute and background stop
     gurgle.js               Synthesised soy-drop bubbles
@@ -87,7 +90,7 @@ src/
   styles/                   base.css, layout.css, chibi.css
 assets/                     Artwork, chibi barista, vendored Three.js (MIT)
 scripts/                    check.js, serve.js (dev only), build.js
-tests/                      node:test suites for each layer plus pipeline seams
+tests/                      node:test suites per layer, pipeline seams, motion replay harness
 docs/                       motion-mapping.md, ui-style-guide.md, release-checklist.md
 ```
 
@@ -98,6 +101,19 @@ docs/                       motion-mapping.md, ui-style-guide.md, release-checkl
 - `ui/` does not import `game/` or `motion/` (except the read-only `motionErrors.js`).
 - Only `sensorSource.js` touches device sensor APIs.
 - Nothing in `src/` uses `localStorage`, `sessionStorage`, `indexedDB`, `fetch`, `XMLHttpRequest` or `WebSocket`.
+
+## Motion diagnostics (development only)
+
+Add `?diagnostics=1` to the page address, before any `#`, for example
+`https://withjia-tech.github.io/Morningmix/?diagnostics=1#coffee`. A small panel then shows:
+
+- browser motion permission
+- tilt from your calibrated grip and the filtered pitch
+- the motion state: off, starting, neutral, pouring, paused or blocked
+- pour intensity
+- the last action sent to the game engine, and whether it was accepted
+
+The panel is off without the flag. It reads a frozen copy of the current values: it cannot change the game, keeps no history, stores nothing and sends nothing. Taps pass through it.
 
 ## Sound
 

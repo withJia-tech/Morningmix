@@ -100,3 +100,27 @@ Real-device checks still required: 3D cup/jug and bowl/bottle appearance, actual
 65 tests pass. Three additional engine regressions cover cross-recipe mixture/attempt retention and invalidated sensor epochs, completed orders not regaining attempts, and date/session isolation.
 
 Browser smoke: Coffee top navigation and home card open Morning coffee; after a miss Coffee has four tries; switching to Eggs shows five; Back returns to Coffee with four; home/logo and the Coffee card preserve those four; the current link has `aria-current=page`. The user reported that the egg experience works. Sensor mapping, audio and 3D assets are unchanged in this update.
+
+## test.7 motion diagnostics and replay — 8 November 2026
+
+**Replay harness.** `tests/motionReplay.js` feeds scripted sensor readings through the same modules the app runs: motion session, sensor source, calibration, filter, tilt mapper, intent bus, game engine, orientation guard and visibility observer. Only the clock, the sensor events, the window and the document are fake. Each step returns a frozen diagnostics snapshot, so a run is a trace that can be compared exactly. Thresholds come from `MOTION_RULES`; none are restated.
+
+`tests/motionReplay.test.js` checks:
+
+1. neutral grip, no pour
+2. deadband in both directions and at its edge, including the first reading after returning from a pour
+3. beyond threshold: intensity (|tilt| − 10) ÷ 35 and a rate within 2 portions/s; backward tilt matches; full tilt caps at 1
+4. permission denied or blocked: no listener, no pour, reported as blocked
+5. rotation: immediate listener removal, cup kept, no try used
+6. page hidden: immediate stop; a reading that arrives between hiding and the event cannot pour
+7. two runs of one script from fresh starts give identical traces
+
+Two more tests check that the diagnostics are a read-only copy and that the panel is off without `?diagnostics=1`.
+
+**Mutation check (how the tests were validated).** Three plausible regressions were injected one at a time. At first only one was caught. Returning to exactly the deadband edge and rotation leaving the sensor attached both survived. The first gap was that the test never returned from a pour; the second was that the engine's epoch check hid the bug on the next reading. The tests were tightened to check those moments directly. All three regressions are now caught, with no production code changed for them.
+
+**Known limitations found**
+
+- *Near-upright tilt (open TODO test).* The pipeline uses the browser's Euler `beta`/`gamma`. With the phone near upright, a 1° twist reads as a roll of more than 50°, so a forward big pour stops as `reposition` at about 89–90°. Reproduce with `node --test tests/motionReplay.test.js` (reported as TODO). The fix needs a gravity-vector mapping, which changes motion behaviour, so it is not part of this change.
+- *No-sensor browsers.* Desktop Chromium sends one trusted `deviceorientation` event with null values when no sensor exists. The app reports that as `invalid_readings` ("The sensor sent invalid readings") rather than `unsupported`. Seen through the diagnostics panel; the behaviour is unchanged from before test.7.
+- The replay drives `beta`/`gamma` values, not hardware. Real-phone acceptance is still required.

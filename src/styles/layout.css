@@ -19,3 +19,9 @@ header{flex:none;display:flex;align-items:center;justify-content:space-between;g
 .order-choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:116px;padding:13px 8px;border:2px solid #377761;border-radius:18px;background:#e5f3e6;box-shadow:0 4px 0 #b6cbb6}
 .order-choice:last-child{background:#fff0ca;border-color:#c09343;box-shadow:0 4px 0 #dfc68f}
 .choice-icon{font-size:27px;line-height:1.2}.order-choice strong{font-size:18px}.order-choice small{font-size:11px}.switch-note{font-size:11px}
+
+/* Development-only motion diagnostics (?diagnostics=1). Never intercepts touches. */
+.diagnostics-panel{position:fixed;z-index:20;top:calc(env(safe-area-inset-top) + 112px);right:max(8px,env(safe-area-inset-right));width:min(232px,62vw);padding:8px 10px;border:2px solid var(--ink);border-radius:10px;background:rgba(255,253,246,.94);color:var(--ink);font:11px/1.35 ui-monospace,Menlo,Consolas,monospace;pointer-events:none;box-shadow:0 3px 0 #c3b89e}
+.diagnostics-panel strong{display:block;font-size:10px;letter-spacing:.6px;text-transform:uppercase;margin-bottom:4px}
+.diagnostics-panel dl{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;margin:0}
+.diagnostics-panel dt{font-weight:700}.diagnostics-panel dd{margin:0;overflow-wrap:anywhere}
